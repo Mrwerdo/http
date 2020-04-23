@@ -50,7 +50,9 @@ final class HTTPServerHandler: ChannelInboundHandler, RemovableChannelHandler {
             context.write(self.wrapOutboundOut(res), promise: nil)
         default:
             var res = res
-            res.headers.add(name: .connection, value: req.isKeepAlive ? "keep-alive" : "close")
+            if res.headers["connection"].count == 0 {
+                res.headers.add(name: .connection, value: req.isKeepAlive ? "keep-alive" : "close")
+            }
             let done = context.write(self.wrapOutboundOut(res))
             if !req.isKeepAlive {
                 _ = done.flatMap {
